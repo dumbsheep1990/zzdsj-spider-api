@@ -186,7 +186,6 @@ async def crawl_subdomain(self, subdomain_id: str) -> Dict[str, Any]:
 
         self._task = asyncio.create_task(run_crawler())
 
-        # Update subdomain status
         await db.urls.update_one(
             {"_id": ObjectId(subdomain_id)},
             {"$set": {"crawl_status": "in_progress", "crawl_started_at": datetime.now()}}
