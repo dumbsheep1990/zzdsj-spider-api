@@ -1,0 +1,240 @@
+# 政策文档智能爬虫框架配置文件
+# 创建时间: 2025-03-27
+# 更新时间: 2025-03-27
+#
+# 配置模板:
+# - config.minimal.yaml: 最小支持版本，仅包含基础必要服务
+# - config.full.yaml: 完整最佳支持版本，包含所有推荐服务
+
+# 应用全局配置
+app_name: "政策文档智能爬虫框架"
+version: "1.0.0"
+api_host: "0.0.0.0"
+api_port: 8000
+debug: true
+
+# 数据库配置
+databases:
+  # 主MongoDB数据库配置
+  primary:
+    type: "mongodb"
+    uri: "mongodb://localhost:27017"
+    name: "llm_spider"
+    enabled: true
+    description: "主数据库，存储爬虫任务和文章数据"
+    params: {}
+  
+  # PostgreSQL数据库配置示例
+  postgres:
+    type: "postgresql"
+    host: "localhost"
+    port: 5432
+    name: "llm_spider"
+    username: "postgres"
+    password: "password"
+    enabled: false
+    description: "关系型数据库，用于存储结构化数据"
+    params:
+      min_size: 10
+      max_size: 20
+
+# 中间件服务配置
+middlewares:
+  # Redis缓存配置
+  cache:
+    type: "redis"
+    host: "localhost"
+    port: 6379
+    password: ""
+    enabled: false
+    description: "用于缓存和任务队列"
+    params: {}
+  
+  # Elasticsearch全文搜索配置
+  search:
+    type: "elasticsearch"
+    host: "localhost"
+    port: 9200
+    username: ""
+    password: ""
+    enabled: false
+    description: "用于全文搜索和日志分析"
+    params: {}
+  
+  # 向量数据库配置 (修改为Milvus)
+  vector:
+    type: "milvus"
+    host: "localhost"
+    port: 19530
+    enabled: false
+    description: "用于存储和检索文章的向量表示"
+    params:
+      collection_name: "document_embeddings"
+      dimension: 1536  # 默认使用OpenAI embedding模型的维度
+  
+  # MinIO对象存储配置 (新增)
+  storage:
+    type: "minio"
+    host: "localhost"
+    port: 9000
+    username: "minioadmin"
+    password: "minioadmin"
+    enabled: false
+    description: "用于存储原始文档和处理结果"
+    params:
+      secure: false
+      bucket_name: "llm-spider-docs"
+
+# LLM服务配置
+llm_services:
+  # OpenAI配置
+  openai:
+    type: "openai"
+    name: "OpenAI"
+    uri: "https://api.openai.com/v1"
+    api_key: ""
+    enabled: false
+    description: "用于AI文本处理和问答"
+    models:
+      - "gpt-3.5-turbo"
+      - "gpt-4"
+    default_model: "gpt-3.5-turbo"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # Azure OpenAI配置
+  azure_openai:
+    type: "azure"
+    name: "Azure OpenAI"
+    api_base: "https://your-resource-name.openai.azure.com"
+    api_key: ""
+    api_version: "2023-05-15"
+    deployment_name: "your-deployment-name"
+    enabled: false
+    description: "Azure OpenAI服务"
+    models:
+      - "gpt-35-turbo"
+    default_model: "gpt-35-turbo"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # Anthropic Claude配置
+  anthropic:
+    type: "anthropic"
+    name: "Anthropic Claude"
+    uri: "https://api.anthropic.com/v1"
+    api_key: ""
+    enabled: false
+    description: "Anthropic Claude模型服务"
+    models:
+      - "claude-3-opus-20240229"
+      - "claude-3-sonnet-20240229"
+      - "claude-3-haiku-20240307"
+    default_model: "claude-3-sonnet-20240229"
+    is_openai_compatible: false
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # Ollama本地LLM配置
+  ollama:
+    type: "ollama"
+    name: "Ollama"
+    uri: "http://localhost:11434"
+    enabled: true
+    description: "本地部署的大语言模型服务"
+    models:
+      - "llama2"
+      - "mistral"
+      - "deepseek-r1-distill-qwen-32b"
+    default_model: "deepseek-r1-distill-qwen-32b"
+    is_openai_compatible: false
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # DeepSeek 模型配置 (新增)
+  deepseek:
+    type: "custom"
+    name: "DeepSeek"
+    uri: "https://vl.cpolar.cn/api/chat"
+    api_key: ""
+    enabled: true
+    description: "DeepSeek 模型服务"
+    models:
+      - "deepseek-r1-distill-qwen-32b"
+    default_model: "deepseek-r1-distill-qwen-32b"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # BCE 向量模型配置 (新增)
+  bce:
+    type: "custom"
+    name: "BCE"
+    uri: "https://vl.cpolar.cn/api/embed"
+    api_key: ""
+    enabled: true
+    description: "BCE 向量模型服务"
+    models:
+      - "bce-local-base_v1"
+    default_model: "bce-local-base_v1"
+    is_openai_compatible: true
+    params:
+      dimension: 1024
+  
+  # 汇总AI模型配置 (第三方模型服务，兼容OpenAI API)
+  huizong:
+    type: "custom"
+    name: "汇总AI"
+    uri: "https://api.huizong.ai/v1"
+    api_key: ""
+    enabled: false
+    description: "汇总AI模型服务，兼容OpenAI API"
+    models:
+      - "huizong-general"
+      - "huizong-academic"
+      - "huizong-policy"
+    default_model: "huizong-policy"
+    is_openai_compatible: true
+    params:
+      temperature: 0.3
+      max_tokens: 4000
+  
+  # 直谱AI GLM模型配置 (第三方模型服务，兼容OpenAI API)
+  zhipu:
+    type: "custom"
+    name: "直谱AI"
+    uri: "https://open.bigmodel.cn/api/paas/v4"
+    api_key: ""
+    enabled: false
+    description: "直谱AI GLM模型服务，兼容OpenAI API"
+    models:
+      - "glm-4"
+      - "glm-3-turbo"
+    default_model: "glm-4"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # 本地模型服务 (第三方模型服务，兼容OpenAI API)
+  local_service:
+    type: "custom"
+    name: "本地模型服务"
+    uri: "http://localhost:8080/v1"
+    api_key: ""
+    enabled: false
+    description: "本地部署的第三方模型服务，兼容OpenAI API"
+    models:
+      - "local-policy-model"
+    default_model: "local-policy-model"
+    is_openai_compatible: true
+    params:
+      temperature: 0.5
+      max_tokens: 4000

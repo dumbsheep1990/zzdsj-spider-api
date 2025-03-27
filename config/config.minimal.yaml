@@ -1,0 +1,108 @@
+# 政策文档智能爬虫框架配置文件（最小支持版本）
+# 创建时间: 2025-03-27
+
+# 应用全局配置
+app_name: "政策文档智能爬虫框架"
+version: "1.0.0"
+api_host: "0.0.0.0"
+api_port: 8000
+debug: true
+
+# 数据库配置
+databases:
+  # 主MongoDB数据库配置
+  primary:
+    type: "mongodb"
+    uri: "mongodb://localhost:27017"
+    name: "llm_spider"
+    enabled: true
+    description: "主数据库，存储爬虫任务和文章数据"
+    params: {}
+
+# 中间件服务配置
+middlewares:
+  # Redis缓存配置
+  cache:
+    type: "redis"
+    host: "localhost"
+    port: 6379
+    password: ""
+    enabled: false
+    description: "用于缓存和任务队列"
+    params: {}
+  
+  # 向量数据库配置 (Milvus)
+  vector:
+    type: "milvus"
+    host: "localhost"
+    port: 19530
+    enabled: false
+    description: "用于存储和检索文章的向量表示"
+    params:
+      collection_name: "document_embeddings"
+
+# LLM服务配置
+llm_services:
+  # Ollama本地LLM配置
+  ollama:
+    type: "ollama"
+    name: "Ollama"
+    uri: "http://localhost:11434"
+    enabled: true
+    description: "本地部署的大语言模型服务"
+    models:
+      - "llama2"
+      - "mistral"
+      - "deepseek-r1-distill-qwen-32b"
+    default_model: "deepseek-r1-distill-qwen-32b"
+    is_openai_compatible: false
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # DeepSeek 模型服务 (第三方模型服务)
+  deepseek:
+    type: "custom"
+    name: "DeepSeek"
+    uri: "https://vl.cpolar.cn/api/chat"
+    api_key: ""
+    enabled: true
+    description: "DeepSeek 模型服务"
+    models:
+      - "deepseek-r1-distill-qwen-32b"
+    default_model: "deepseek-r1-distill-qwen-32b"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # BCE 向量服务 (第三方模型服务)
+  bce:
+    type: "custom"
+    name: "BCE"
+    uri: "https://vl.cpolar.cn/api/embed"
+    api_key: ""
+    enabled: true
+    description: "BCE 向量服务"
+    models:
+      - "bce-local-base_v1"
+    default_model: "bce-local-base_v1"
+    is_openai_compatible: true
+    params:
+      dimension: 1024
+  
+  # 本地模型服务 (第三方模型服务，兼容OpenAI API)
+  local_service:
+    type: "custom"
+    name: "本地模型服务"
+    uri: "http://localhost:8080/v1"
+    api_key: ""
+    enabled: false
+    description: "本地部署的第三方模型服务，兼容OpenAI API"
+    models:
+      - "local-policy-model"
+    default_model: "local-policy-model"
+    is_openai_compatible: true
+    params:
+      temperature: 0.5
+      max_tokens: 4000

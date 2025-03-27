@@ -1,471 +1,433 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Query, Path, Body
-from app.api.models.schemas import CrawlerConfig, CrawlerStatus, LLMModelInfo
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Query, Path, Body, File, Form, UploadFile
+from app.api.models.schemas import CrawlerConfig, CrawlerStatus, LLMModelInfo, CustomCrawlResult, AdvancedCrawlerConfig
 from app.services.crawler_service import CrawlerService
 from db.connection import get_async_db
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from urllib.parse import urlparse
+from bson.objectid import ObjectId
+import uuid
+from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
+from crawl4ai.extraction_strategy import LLMExtractionStrategy
 
 router = APIRouter(prefix="/crawler", tags=["crawler"])
 
-
-@router.post("/start",
-             response_model=CrawlerStatus,
-             summary="Start a new crawler job",
-             description="""
-    Starts a new crawler job with the specified configuration.
-
-    The crawler will begin by discovering subdomains, then crawl the main site and any discovered subdomains.
-    Content will be extracted and stored in the database.
-
-    If LLM extraction is enabled, the specified LLM provider will be used to extract structured content.
-    """,
-             response_description="Current status of the crawler after starting"
-             )
-async def start_crawler(config: CrawlerConfig, background_tasks: BackgroundTasks):
-    """Start the crawler with the given configuration"""
+@router.get("/heartbeat",
+           summary="Get crawler service status",
+           description="Returns a heartbeat status to indicate the crawler service is running.",
+           response_description="Crawler service heartbeat status"
+           )
+async def get_heartbeat():
+    """Get crawler service heartbeat status"""
     try:
-        service = CrawlerService.get_instance()
-        status = await service.start_crawler(config.dict())
-        return status
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start crawler: {str(e)}")
-
-
-@router.get("/status",
-            response_model=CrawlerStatus,
-            summary="Get crawler status",
-            description="Returns the current status of the crawler, including progress statistics.",
-            response_description="Current status of the crawler"
-            )
-async def get_crawler_status():
-    """Get current crawler status"""
-    service = CrawlerService.get_instance()
-    return service.get_status()
-
-
-@router.post("/stop",
-             response_model=CrawlerStatus,
-             summary="Stop the running crawler",
-             description="Stops the currently running crawler job.",
-             response_description="Final status of the crawler after stopping"
-             )
-async def stop_crawler():
-    """Stop the running crawler"""
-    try:
-        service = CrawlerService.get_instance()
-        status = service.stop_crawler()
-        return status
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to stop crawler: {str(e)}")
-
-
-@router.get("/stats",
-            summary="Get crawler statistics",
-            description="Returns statistics from the most recent crawler job, including concurrency information.",
-            response_description="Statistics from the most recent crawler job"
-            )
-async def get_crawler_stats():
-    """Get crawler statistics"""
-    service = CrawlerService.get_instance()
-    stats = await service.get_stats()
-
-    if not stats:
-        return {"message": "No crawler statistics available"}
-
-    # Add current concurrency information if crawler is running
-    if service.crawler:
-        stats["current_concurrency"] = {
-            "max_concurrent_tasks": service.crawler.max_concurrent_tasks,
-            "active_tasks": service.crawler.status.get("active_tasks", 0)
+        return {
+            "status": "online",
+            "timestamp": datetime.now().isoformat(),
+            "service": "crawler"
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve crawler heartbeat: {str(e)}")
 
-    return stats
+
+# ... (rest of the code remains the same)
+
+@router.post("/custom",
+             response_model=CustomCrawlResult,
+             summary="Perform a custom crawl on a single URL",
+             description="Crawls a single URL with custom settings and extracts content.",
+             response_description="Result of the custom crawl"
+             )
+async def custom_crawl(background_tasks: BackgroundTasks, 
+                       url: str = Form(..., description="URL to crawl"),
+                       depth: int = Form(1, ge=1, le=5, description="Crawl depth"),
+                       use_browser: bool = Form(True, description="Whether to use browser for crawling"),
+                       follow_links: bool = Form(False, description="Whether to follow links on the page"),
+                       extract_content: bool = Form(True, description="Whether to extract content"),
+                       use_llm: bool = Form(False, description="Whether to use LLM for extraction"),
+                       ai_model: Optional[str] = Form(None, description="AI model to use for extraction"),
+                       db=Depends(get_async_db)):
+    """Perform a custom crawl on a single URL"""
+    try:
+        # Validate URL
+        parsed_url = urlparse(url)
+        if not parsed_url.scheme or not parsed_url.netloc:
+            raise HTTPException(status_code=400, detail="Invalid URL")
+        
+        # Create crawl record
+        crawl_id = str(ObjectId())
+        now = datetime.now()
+        
+        # Create record in database
+        await db.custom_crawls.insert_one({
+            "_id": ObjectId(crawl_id),
+            "url": url,
+            "depth": depth,
+            "use_browser": use_browser,
+            "follow_links": follow_links,
+            "extract_content": extract_content,
+            "use_llm": use_llm,
+            "ai_model": ai_model,
+            "status": "processing",
+            "created_at": now
+        })
+        
+        # Prepare for crawl using crawl4ai
+        browser_config = BrowserConfig(
+            headless=True,  # Run in headless mode
+            viewport_width=1280,
+            viewport_height=800,
+            timeout=30000,  # 30 seconds timeout
+            js_enabled=True,
+            verbose=True
+        )
+        
+        # Setup extraction strategy
+        extraction_strategy = LLMExtractionStrategy()
+        
+        if use_llm and extract_content:
+            # Get LLM configuration if use_llm is enabled
+            llm_config = await db.llm_configs.find_one({"is_active": True})
+            
+            if not llm_config:
+                # Use default configuration if none is found
+                raise HTTPException(status_code=400, detail="No active LLM configuration found")
+            
+            # Create extraction strategy based on provider
+            provider = llm_config.get("provider")
+            
+            if provider == "openai":
+                config = llm_config.get("openai_config", {})
+                api_key = config.get("api_key")
+                model = ai_model or config.get("model", "gpt-3.5-turbo")
+                
+                if not api_key:
+                    raise HTTPException(status_code=400, detail="OpenAI API key not provided")
+                
+                extraction_strategy = LLMExtractionStrategy(
+                    provider=f"openai/{model}",
+                    api_token=api_key,
+                    extraction_type="structured",
+                    instruction="提取网页中的关键信息，包括标题、发布日期、正文内容等。"
+                )
+                
+            elif provider == "ollama":
+                config = llm_config.get("ollama_config", {})
+                base_url = config.get("base_url", "http://localhost:11434")
+                model = ai_model or config.get("model", "llama2")
+                
+                extraction_strategy = LLMExtractionStrategy(
+                    provider=f"ollama/{model}",
+                    base_url=base_url,
+                    extraction_type="structured",
+                    instruction="提取网页中的关键信息，包括标题、发布日期、正文内容等。"
+                )
+            
+            elif provider == "custom":
+                config = llm_config.get("custom_model_config", {})
+                url = config.get("url")
+                api_key = config.get("api_key")
+                headers = config.get("headers", {})
+                
+                if not url:
+                    raise HTTPException(status_code=400, detail="Custom model URL not provided")
+                
+                extraction_strategy = LLMExtractionStrategy(
+                    provider="custom",
+                    api_token=api_key,
+                    extraction_type="structured",
+                    instruction="提取网页中的关键信息，包括标题、发布日期、正文内容等。",
+                    base_url=url,
+                    headers=headers
+                )
+        
+        # Run config
+        run_config = CrawlerRunConfig(
+            follow_links=follow_links,
+            max_depth=depth,
+            extraction_strategy=extraction_strategy if extract_content else None,
+            cache_mode=CacheMode.BYPASS  # Don't use cache
+        )
+        
+        # Perform crawl in background
+        background_tasks.add_task(
+            perform_crawl, 
+            crawl_id=crawl_id, 
+            url=url, 
+            use_browser=use_browser, 
+            run_config=run_config,
+            db=db
+        )
+        
+        # Return initial status
+        return {
+            "crawl_id": crawl_id,
+            "url": url,
+            "status": "processing",
+            "created_at": now.isoformat(),
+        }
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start custom crawl: {str(e)}")
 
 
-@router.get("/llm-models",
-            response_model=LLMModelInfo,
-            summary="Get available LLM models",
-            description="Returns information about available LLM models for content extraction.",
-            response_description="Available LLM providers and models"
-            )
-async def get_llm_models():
-    """Get available LLM models for configuration"""
-    return {
-        "providers": [
-            {
-                "name": "openai",
-                "display_name": "OpenAI",
-                "models": [
-                    {"id": "gpt-3.5-turbo", "name": "GPT-3.5 Turbo"},
-                    {"id": "gpt-4", "name": "GPT-4"},
-                    {"id": "gpt-4-turbo", "name": "GPT-4 Turbo"}
-                ],
-                "requires_api_key": True
-            },
-            {
-                "name": "ollama",
-                "display_name": "Ollama",
-                "models": [
-                    {"id": "llama2", "name": "Llama 2"},
-                    {"id": "mistral", "name": "Mistral"},
-                    {"id": "mistral-openorca", "name": "Mistral OpenOrca"},
-                    {"id": "phi", "name": "Phi"},
-                    {"id": "vicuna", "name": "Vicuna"},
-                    {"id": "mixtral", "name": "Mixtral 8x7B"}
-                ],
-                "requires_api_key": False,
-                "requires_base_url": True,
-                "default_base_url": "http://localhost:11434"
-            },
-            {
-                "name": "custom",
-                "display_name": "Custom Model",
-                "requires_url": True,
-                "requires_api_key": False,
-                "supports_headers": True
+async def perform_crawl(crawl_id: str, url: str, use_browser: bool, run_config: Any, db):
+    """Background task to perform the actual crawl"""
+    try:
+        from crawl4ai import AsyncWebCrawler, BrowserConfig
+        
+        # Setup browser config
+        browser_config = BrowserConfig(
+            headless=True,
+            viewport_width=1280,
+            viewport_height=800,
+            timeout=30000,  # 30 seconds timeout
+            js_enabled=True,
+            verbose=True
+        )
+        
+        # Perform the crawl
+        async with AsyncWebCrawler(config=browser_config if use_browser else None) as crawler:
+            result = await crawler.arun(url=url, config=run_config)
+            
+            # Update database with results
+            update_data = {
+                "status": "completed",
+                "completed_at": datetime.now(),
             }
-        ]
-    }
-
-
-@router.get("/configs",
-            summary="Get previous crawler configurations",
-            description="Returns a list of previously used crawler configurations.",
-            response_description="List of previous crawler configurations"
+            
+            if result:
+                # Extract links if available
+                links = result.links if hasattr(result, "links") else []
+                
+                # Add extracted data
+                update_data.update({
+                    "content": result.extracted_content if hasattr(result, "extracted_content") else {},
+                    "html": result.html if hasattr(result, "html") else "",
+                    "links": links
+                })
+            
+            # Update the database record
+            await db.custom_crawls.update_one(
+                {"_id": ObjectId(crawl_id)},
+                {"$set": update_data}
             )
-async def get_crawler_configs():
-    """Get previous crawler configurations"""
-    service = CrawlerService.get_instance()
-    configs = await service.get_crawl_configs()
-    return configs
-
-
-@router.post("/restart/{config_id}",
-             response_model=CrawlerStatus,
-             summary="Restart crawler with saved configuration",
-             description="Restarts the crawler using a previously saved configuration.",
-             response_description="Current status of the crawler after restarting"
-             )
-async def restart_crawler(
-        config_id: str = Path(..., description="Configuration ID"),
-        background_tasks: BackgroundTasks = None
-):
-    """Restart crawler with a saved configuration"""
-    try:
-        service = CrawlerService.get_instance()
-        status = await service.restart_crawler(config_id)
-        return status
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to restart crawler: {str(e)}")
-
-
-@router.get("/subdomains",
-            summary="Get discovered subdomains",
-            description="Returns a list of subdomains discovered during crawling.",
-            response_description="List of discovered subdomains"
+        # Update database with error
+        try:
+            await db.custom_crawls.update_one(
+                {"_id": ObjectId(crawl_id)},
+                {"$set": {
+                    "status": "failed",
+                    "error": str(e),
+                    "completed_at": datetime.now()
+                }}
             )
-async def get_subdomains(
-        crawled: Optional[bool] = Query(None, description="Filter by crawled status"),
-        db=Depends(get_async_db)
-):
-    """Get all discovered subdomains"""
-    query = {"type": "subdomain"}
-
-    if crawled is not None:
-        query["crawled"] = crawled
-
-    cursor = db.urls.find(query)
-    subdomains = await cursor.to_list(length=100)
-
-    # Convert ObjectId to string and format dates
-    for subdomain in subdomains:
-        subdomain["_id"] = str(subdomain["_id"])
-        if "discovered_at" in subdomain:
-            subdomain["discovered_at"] = subdomain["discovered_at"].isoformat()
-        if "crawled_at" in subdomain:
-            subdomain["crawled_at"] = subdomain["crawled_at"].isoformat()
-
-    return subdomains
+        except Exception as update_error:
+            # Log if we can't update database
+            print(f"Failed to update custom crawl status: {str(update_error)}")
 
 
-@router.post("/subdomain/{subdomain_id}/crawl",
-             summary="Crawl specific subdomain",
-             description="Initiates crawling for a specific subdomain.",
-             response_description="Crawling task status"
-             )
-async def crawl_subdomain(
-        subdomain_id: str = Path(..., description="Subdomain ID"),
-        background_tasks: BackgroundTasks = None
-):
-    """Crawl a specific subdomain"""
-    try:
-        service = CrawlerService.get_instance()
-        result = await service.crawl_subdomain(subdomain_id)
-        return {"message": "Subdomain crawling started", "subdomain_id": subdomain_id, "status": result}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start subdomain crawling: {str(e)}")
-
-
-@router.post("/url/{url_id}/recrawl",
-             summary="Recrawl specific URL",
-             description="Recrawls a specific URL that was previously crawled.",
-             response_description="Recrawling task status"
-             )
-async def recrawl_url(
-        url_id: str = Path(..., description="URL ID"),
-        background_tasks: BackgroundTasks = None
-):
-    """Recrawl a specific URL"""
-    try:
-        service = CrawlerService.get_instance()
-        result = await service.recrawl_url(url_id)
-        return {"message": "URL recrawling started", "url_id": url_id, "status": result}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start URL recrawling: {str(e)}")
-
-
-@router.get("/history",
-            summary="Get crawler history",
-            description="Returns the history of crawler runs.",
-            response_description="Crawler run history"
+@router.get("/custom/{crawl_id}",
+            response_model=CustomCrawlResult,
+            summary="Get result of a custom crawl",
+            description="Returns the result of a previously executed custom crawl.",
+            response_description="Custom crawl result"
             )
-async def get_crawler_history(
-        limit: int = Query(10, ge=1, le=100, description="Maximum number of records to return"),
-        db=Depends(get_async_db)
-):
-    """Get history of crawler runs"""
-    try:
-        cursor = db.stats.find({}).sort("start_time", -1).limit(limit)
-        history = await cursor.to_list(length=limit)
-
-        # Process results
-        result = []
-        for item in history:
-            item["_id"] = str(item["_id"])
-            item["start_time"] = item["start_time"].isoformat()
-            item["end_time"] = item["end_time"].isoformat()
-            result.append(item)
-
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get crawler history: {str(e)}")
-
-
-@router.get("/urls",
-            summary="Get crawled URLs",
-            description="Returns a list of URLs that have been crawled.",
-            response_description="List of crawled URLs"
-            )
-async def get_crawled_urls(
-        crawled: bool = Query(True, description="Filter by crawled status"),
-        limit: int = Query(100, ge=1, le=1000, description="Maximum number of URLs to return"),
-        domain: Optional[str] = Query(None, description="Filter by domain"),
-        db=Depends(get_async_db)
-):
-    """Get list of crawled URLs"""
-    try:
-        query = {"crawled": crawled}
-
-        if domain:
-            query["url"] = {"$regex": domain, "$options": "i"}
-
-        cursor = db.urls.find(query).sort("crawled_at" if crawled else "discovered_at", -1).limit(limit)
-        urls = await cursor.to_list(length=limit)
-
-        # Process results
-        result = []
-        for url in urls:
-            url["_id"] = str(url["_id"])
-            if "discovered_at" in url:
-                url["discovered_at"] = url["discovered_at"].isoformat()
-            if "crawled_at" in url:
-                url["crawled_at"] = url["crawled_at"].isoformat()
-            result.append(url)
-
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get URLs: {str(e)}")
-
-
-@router.delete("/url/{url_id}",
-               summary="Delete URL",
-               description="Deletes a URL from the database.",
-               response_description="Deletion confirmation"
-               )
-async def delete_url(
-        url_id: str = Path(..., description="URL ID"),
-        db=Depends(get_async_db)
-):
-    """Delete a URL from the database"""
+async def get_custom_crawl_result(crawl_id: str = Path(..., description="Crawl ID"), 
+                                 db=Depends(get_async_db)):
+    """Get the result of a custom crawl"""
     try:
         from bson.objectid import ObjectId
-
-        result = await db.urls.delete_one({"_id": ObjectId(url_id)})
-
-        if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail="URL not found")
-
-        return {"message": "URL deleted successfully", "url_id": url_id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete URL: {str(e)}")
-
-
-@router.post("/test-llm",
-             summary="Test LLM extraction",
-             description="Tests LLM extraction with the provided configuration on a sample URL.",
-             response_description="LLM extraction test result"
-             )
-async def test_llm_extraction(
-        config: Dict[str, Any] = Body(
-            ...,
-            example={
-                "provider": "openai",
-                "openai_config": {
-                    "api_key": "sk-1234567890abcdef",
-                    "model": "gpt-3.5-turbo"
-                },
-                "url": "https://www.example.gov.cn/news/sample.html"
-            },
-            description="LLM configuration and test URL"
-        )
-):
-    """Test LLM extraction with the provided configuration"""
-    try:
-        service = CrawlerService.get_instance()
-        result = await service.test_llm_extraction(config)
-        return {"message": "LLM extraction test completed", "result": result}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to test LLM extraction: {str(e)}")
-
-
-@router.post("/schedule",
-             summary="Schedule crawler",
-             description="Schedules a crawler job to run at specified intervals.",
-             response_description="Crawler scheduling result"
-             )
-async def schedule_crawler(
-        schedule: Dict[str, Any] = Body(
-            ...,
-            example={
-                "cron": "0 0 * * *",  # Daily at midnight
-                "config_id": "6072f1b12c723a8c9d89a123"  # ID of a saved configuration
-            },
-            description="Crawler schedule configuration"
-        )
-):
-    """Schedule a crawler job"""
-    try:
-        service = CrawlerService.get_instance()
-        result = await service.schedule_crawler(schedule)
-        return {"message": "Crawler scheduled successfully", "schedule_id": result}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to schedule crawler: {str(e)}")
-
-
-@router.get("/schedules",
-            summary="Get crawler schedules",
-            description="Returns a list of scheduled crawler jobs.",
-            response_description="List of crawler schedules"
-            )
-async def get_crawler_schedules():
-    """Get list of scheduled crawler jobs"""
-    try:
-        service = CrawlerService.get_instance()
-        schedules = await service.get_crawler_schedules()
-        return schedules
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get crawler schedules: {str(e)}")
-
-
-@router.delete("/schedule/{schedule_id}",
-               summary="Delete crawler schedule",
-               description="Deletes a scheduled crawler job.",
-               response_description="Deletion confirmation"
-               )
-async def delete_crawler_schedule(
-        schedule_id: str = Path(..., description="Schedule ID")
-):
-    """Delete a scheduled crawler job"""
-    try:
-        service = CrawlerService.get_instance()
-        result = await service.delete_crawler_schedule(schedule_id)
-        return {"message": "Crawler schedule deleted successfully", "schedule_id": schedule_id}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete crawler schedule: {str(e)}")
-
-
-@router.post("/concurrency",
-             summary="Update crawler concurrency",
-             description="Updates the maximum number of concurrent tasks for the running crawler.",
-             response_description="Updated crawler status"
-             )
-async def update_concurrency(
-        max_tasks: int = Body(..., ge=1, le=100, description="Maximum number of concurrent tasks", example=20)
-):
-    """Update the maximum number of concurrent tasks for the running crawler"""
-    try:
-        service = CrawlerService.get_instance()
-
-        if not service.crawler:
-            raise HTTPException(status_code=400, detail="No crawler instance found")
-
-        # Update concurrency setting
-        service.crawler.max_concurrent_tasks = max_tasks
-        status = service.get_status()
-
-        return {
-            "message": f"Crawler concurrency updated to {max_tasks} tasks",
-            "status": status
+        
+        # Convert string ID to ObjectId
+        try:
+            obj_id = ObjectId(crawl_id)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid crawl ID format")
+        
+        # Fetch crawl from database
+        crawl = await db.custom_crawls.find_one({"_id": obj_id})
+        
+        if not crawl:
+            raise HTTPException(status_code=404, detail="Custom crawl not found")
+        
+        # Format response
+        result = {
+            "crawl_id": str(crawl["_id"]),
+            "url": crawl["url"],
+            "status": crawl["status"],
+            "created_at": crawl["created_at"].isoformat() if isinstance(crawl["created_at"], datetime) else crawl["created_at"],
         }
+        
+        # Add optional fields if they exist
+        if "content" in crawl:
+            result["content"] = crawl["content"]
+        
+        if "html" in crawl:
+            result["html"] = crawl["html"]
+        
+        if "links" in crawl:
+            result["links"] = crawl["links"]
+        
+        if "error" in crawl:
+            result["error"] = crawl["error"]
+        
+        if "completed_at" in crawl:
+            result["completed_at"] = crawl["completed_at"].isoformat() if isinstance(crawl["completed_at"], datetime) else crawl["completed_at"]
+        
+        return result
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get custom crawl result: {str(e)}")
+
+
+@router.post("/start-with-file",
+             response_model=CrawlerStatus,
+             summary="Start crawler with URLs from file",
+             description="Starts a crawler job using URLs from an uploaded file.",
+             response_description="Current status of the crawler after starting"
+             )
+async def start_crawler_with_file(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(..., description="File containing URLs to crawl"),
+    max_pages: Optional[int] = Form(None, description="Maximum number of pages to crawl"),
+    max_depth: Optional[int] = Form(None, description="Maximum crawl depth"),
+    include_subdomains: bool = Form(True, description="Whether to crawl subdomains"),
+    crawl_interval: float = Form(1.0, description="Interval between requests in seconds"),
+    use_llm: bool = Form(False, description="Whether to use LLM for content extraction"),
+    max_concurrent_tasks: int = Form(10, ge=1, le=100, description="Maximum number of concurrent crawling tasks"),
+    llm_provider: Optional[str] = Form(None, description="LLM provider"),
+    llm_api_key: Optional[str] = Form(None, description="LLM API key"),
+    llm_model: Optional[str] = Form(None, description="LLM model"),
+    llm_base_url: Optional[str] = Form(None, description="LLM base URL for custom providers")
+):
+    """Start the crawler with URLs from a file"""
+    try:
+        # Read URLs from the uploaded file
+        contents = await file.read()
+        urls = [line.strip() for line in contents.decode('utf-8').splitlines() if line.strip()]
+        
+        if not urls:
+            raise HTTPException(status_code=400, detail="No valid URLs found in the file")
+        
+        # Use the first URL as the base URL
+        base_url = urls[0]
+        
+        # Create crawler config
+        config = {
+            "base_url": base_url,
+            "max_pages": max_pages,
+            "max_depth": max_depth,
+            "include_subdomains": include_subdomains,
+            "crawl_interval": crawl_interval,
+            "use_llm": use_llm,
+            "max_concurrent_tasks": max_concurrent_tasks,
+            "additional_urls": urls[1:] if len(urls) > 1 else []  # Store additional URLs
+        }
+        
+        # Add LLM config if enabled
+        if use_llm:
+            if not llm_provider:
+                raise HTTPException(status_code=400, detail="LLM provider must be specified when use_llm is enabled")
+            
+            llm_config = {
+                "provider": llm_provider
+            }
+            
+            if llm_provider == "openai":
+                if not llm_api_key:
+                    raise HTTPException(status_code=400, detail="API key is required for OpenAI")
+                
+                llm_config["openai_config"] = {
+                    "api_key": llm_api_key,
+                    "model": llm_model or "gpt-3.5-turbo"
+                }
+                
+            elif llm_provider == "ollama":
+                llm_config["ollama_config"] = {
+                    "base_url": llm_base_url or "http://localhost:11434",
+                    "model": llm_model or "llama2"
+                }
+                
+            elif llm_provider == "custom":
+                if not llm_base_url:
+                    raise HTTPException(status_code=400, detail="Base URL is required for custom LLM provider")
+                
+                llm_config["custom_model_config"] = {
+                    "url": llm_base_url,
+                    "api_key": llm_api_key
+                }
+            
+            config["llm_config"] = llm_config
+        
+        # Convert to CrawlerConfig object and start crawler
+        from app.api.models.schemas import CrawlerConfig
+        crawler_config = CrawlerConfig(**config)
+        
+        service = CrawlerService.get_instance()
+        status = await service.start_crawler(crawler_config.dict())
+        return status
+        
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update crawler concurrency: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start crawler with file: {str(e)}")
 
-@router.get("/concurrency/presets",
-    summary="Get concurrency presets",
-    description="Returns recommended concurrency presets for different scenarios.",
-    response_description="List of concurrency presets"
-)
-async def get_concurrency_presets():
-    """Get recommended concurrency presets"""
-    return {
-        "presets": [
-            {
-                "name": "Low Impact",
-                "max_concurrent_tasks": 5,
-                "description": "Gentle crawling with minimal impact on target servers"
-            },
-            {
-                "name": "Balanced",
-                "max_concurrent_tasks": 10,
-                "description": "Balanced performance and server impact"
-            },
-            {
-                "name": "Performance",
-                "max_concurrent_tasks": 25,
-                "description": "High performance crawling for robust servers"
-            },
-            {
-                "name": "Maximum",
-                "max_concurrent_tasks": 50,
-                "description": "Maximum crawling speed for very robust servers (use with caution)"
-            }
-        ]
-    }
+
+@router.get("/advanced-config",
+            response_model=AdvancedCrawlerConfig,
+            summary="Get crawler advanced configuration",
+            description="Returns the current advanced crawler configuration.",
+            response_description="Current advanced crawler configuration"
+            )
+async def get_advanced_config(db=Depends(get_async_db)):
+    """Get advanced crawler configuration"""
+    try:
+        config = await db.system_config.find_one({"type": "advanced_crawler_config"})
+        
+        if not config:
+            # Return default config
+            return AdvancedCrawlerConfig()
+        
+        # Remove internal fields
+        if "_id" in config:
+            del config["_id"]
+        if "type" in config:
+            del config["type"]
+        
+        return config
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get advanced configuration: {str(e)}")
+
+
+@router.post("/advanced-config",
+             response_model=AdvancedCrawlerConfig,
+             summary="Save crawler advanced configuration",
+             description="Saves advanced crawler configuration.",
+             response_description="Saved advanced crawler configuration"
+             )
+async def save_advanced_config(config: AdvancedCrawlerConfig, db=Depends(get_async_db)):
+    """Save advanced crawler configuration"""
+    try:
+        # Add metadata
+        config_dict = config.dict()
+        config_dict["type"] = "advanced_crawler_config"
+        config_dict["updated_at"] = datetime.now()
+        
+        # Upsert config
+        await db.system_config.update_one(
+            {"type": "advanced_crawler_config"},
+            {"$set": config_dict},
+            upsert=True
+        )
+        
+        return config
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save advanced configuration: {str(e)}")

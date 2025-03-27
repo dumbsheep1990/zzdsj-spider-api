@@ -1,0 +1,210 @@
+# u653fu7b56u6587u6863u667au80fdu722cu866bu6846u67b6u914du7f6eu6587u4ef6uff08u5b8cu6574u6700u4f73u652fu6301u7248u672cuff09
+# u521bu5efau65f6u95f4: 2025-03-27
+
+# u5e94u7528u5168u5c40u914du7f6e
+app_name: "u653fu7b56u6587u6863u667au80fdu722cu866bu6846u67b6"
+version: "1.0.0"
+api_host: "0.0.0.0"
+api_port: 8000
+debug: true
+
+# u6570u636eu5e93u914du7f6e
+databases:
+  # u4e3bMongoDBu6570u636eu5e93u914du7f6e
+  primary:
+    type: "mongodb"
+    uri: "mongodb://localhost:27017"
+    name: "llm_spider"
+    enabled: true
+    description: "u4e3bu6570u636eu5e93uff0cu5b58u50a8u722cu866bu4efbu52a1u548cu6587u7ae0u6570u636e"
+    params: {}
+  
+  # PostgreSQLu6570u636eu5e93u914du7f6eu793au4f8b
+  postgres:
+    type: "postgresql"
+    host: "localhost"
+    port: 5432
+    name: "llm_spider"
+    username: "postgres"
+    password: "password"
+    enabled: false
+    description: "u5173u7cfbu578bu6570u636eu5e93uff0cu7528u4e8eu5b58u50a8u7ed3u6784u5316u6570u636e"
+    params:
+      min_size: 10
+      max_size: 20
+
+# u4e2du95f4u4ef6u670du52a1u914du7f6e
+middlewares:
+  # Redisu7f13u5b58u914du7f6e
+  cache:
+    type: "redis"
+    host: "localhost"
+    port: 6379
+    password: ""
+    enabled: true
+    description: "u7528u4e8eu7f13u5b58u548cu4efbu52a1u961fu5217"
+    params: {}
+  
+  # Elasticsearchu5168u6587u641cu7d22u914du7f6e
+  search:
+    type: "elasticsearch"
+    host: "localhost"
+    port: 9200
+    username: ""
+    password: ""
+    enabled: true
+    description: "u7528u4e8eu5168u6587u641cu7d22u548cu65e5u5fd7u5206u6790"
+    params: {}
+  
+  # u5411u91cfu6570u636eu5e93u914du7f6e (Milvus)
+  vector:
+    type: "milvus"
+    host: "localhost"
+    port: 19530
+    enabled: true
+    description: "u7528u4e8eu5b58u50a8u548cu68c0u7d22u6587u7ae0u7684u5411u91cfu8868u793a"
+    params:
+      collection_name: "document_embeddings"
+      dimension: 1536  # u9ed8u8ba4u4f7fu7528OpenAI embeddingu6a21u578bu7684u7ef4u5ea6
+  
+  # MinIOu5bf9u8c61u5b58u50a8u914du7f6e
+  storage:
+    type: "minio"
+    host: "localhost"
+    port: 9000
+    username: "minioadmin"
+    password: "minioadmin"
+    enabled: true
+    description: "u7528u4e8eu5b58u50a8u539fu59cbu6587u6863u548cu5904u7406u7ed3u679c"
+    params:
+      secure: false
+      bucket_name: "llm-spider-docs"
+
+# LLMu670du52a1u914du7f6e
+llm_services:
+  # OpenAIu914du7f6e
+  openai:
+    type: "openai"
+    name: "OpenAI"
+    uri: "https://api.openai.com/v1"
+    api_key: ""
+    enabled: true
+    description: "u7528u4e8eAIu6587u672cu5904u7406u548cu95eeu7b54"
+    models:
+      - "gpt-3.5-turbo"
+      - "gpt-4"
+      - "gpt-4-turbo"
+      - "gpt-4o"
+    default_model: "gpt-4"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # Azure OpenAIu914du7f6e
+  azure_openai:
+    type: "azure"
+    name: "Azure OpenAI"
+    api_base: "https://your-resource-name.openai.azure.com"
+    api_key: ""
+    api_version: "2023-05-15"
+    deployment_name: "your-deployment-name"
+    enabled: false
+    description: "Azure OpenAIu670du52a1"
+    models:
+      - "gpt-35-turbo"
+      - "gpt-4"
+    default_model: "gpt-4"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # Anthropic Claudeu914du7f6e
+  anthropic:
+    type: "anthropic"
+    name: "Anthropic Claude"
+    uri: "https://api.anthropic.com/v1"
+    api_key: ""
+    enabled: true
+    description: "Anthropic Claudeu6a21u578bu670du52a1"
+    models:
+      - "claude-3-opus-20240229"
+      - "claude-3-sonnet-20240229"
+      - "claude-3-haiku-20240307"
+    default_model: "claude-3-opus-20240229"
+    is_openai_compatible: false
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # Ollamau672cu5730LLMu914du7f6e
+  ollama:
+    type: "ollama"
+    name: "Ollama"
+    uri: "http://localhost:11434"
+    enabled: true
+    description: "u672cu5730u90e8u7f72u7684u5927u8bedu8a00u6a21u578bu670du52a1"
+    models:
+      - "llama2"
+      - "mistral"
+      - "mixtral"
+      - "gemma"
+      - "yi"
+      - "qwen"
+    default_model: "mixtral"
+    is_openai_compatible: false
+    params:
+      temperature: 0.7
+      max_tokens: 4000
+  
+  # u6c47u603bAIu6a21u578bu914du7f6e (u7b2cu4e09u65b9u6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API)
+  huizong:
+    type: "custom"
+    name: "u6c47u603bAI"
+    uri: "https://api.huizong.ai/v1"
+    api_key: ""
+    enabled: false
+    description: "u6c47u603bAIu6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API"
+    models:
+      - "huizong-general"
+      - "huizong-academic"
+      - "huizong-policy"
+    default_model: "huizong-policy"
+    is_openai_compatible: true
+    params:
+      temperature: 0.3
+      max_tokens: 4000
+  
+  # u76f4u8c31AI GLMu6a21u578bu914du7f6e (u7b2cu4e09u65b9u6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API)
+  zhipu:
+    type: "custom"
+    name: "u76f4u8c31AI"
+    uri: "https://open.bigmodel.cn/api/paas/v4"
+    api_key: ""
+    enabled: true
+    description: "u76f4u8c31AI GLMu6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API"
+    models:
+      - "glm-4"
+      - "glm-3-turbo"
+    default_model: "glm-4"
+    is_openai_compatible: true
+    params:
+      temperature: 0.7
+      max_tokens: 2000
+  
+  # u672cu5730u6a21u578bu670du52a1 (u7b2cu4e09u65b9u6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API)
+  local_service:
+    type: "custom"
+    name: "u672cu5730u6a21u578bu670du52a1"
+    uri: "http://localhost:8080/v1"
+    api_key: ""
+    enabled: false
+    description: "u672cu5730u90e8u7f72u7684u7b2cu4e09u65b9u6a21u578bu670du52a1uff0cu517cu5bb9OpenAI API"
+    models:
+      - "local-policy-model"
+    default_model: "local-policy-model"
+    is_openai_compatible: true
+    params:
+      temperature: 0.5
+      max_tokens: 4000

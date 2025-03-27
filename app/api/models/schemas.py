@@ -330,3 +330,205 @@ class CleaningStatus(BaseModel):
                 "current_article_id": "6072f1b12c723a8c9d89a123"
             }
         }
+
+# AI Extraction API models
+class AIExtractConfig(BaseModel):
+    url: Optional[str] = Field(None, description="URL to extract content from")
+    html_content: Optional[str] = Field(None, description="HTML content to extract from")
+    ai_model: str = Field("gpt-3.5-turbo", description="AI model to use for extraction")
+    custom_prompt: Optional[str] = Field(None, description="Custom extraction prompt")
+    extraction_schema: Optional[Dict[str, Any]] = Field(None, description="Extraction schema")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "url": "https://www.example.gov.cn/news/123.html",
+                "ai_model": "gpt-3.5-turbo",
+                "custom_prompt": "从网页中提取标题、发布日期、发布部门和正文内容。"
+            }
+        }
+
+
+class AIExtractTemplate(BaseModel):
+    name: str = Field(..., description="Template name")
+    prompt: str = Field(..., description="Extraction prompt")
+    schema: Optional[Dict[str, Any]] = Field(None, description="Extraction schema")
+    description: Optional[str] = Field(None, description="Template description")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "标准政府网站提取",
+                "prompt": "从政府网站文章中提取标题、发布日期、发布部门和正文内容。",
+                "description": "标准的政府网站文章提取模板"
+            }
+        }
+
+
+class BatchExtractConfig(BaseModel):
+    urls: List[str] = Field(..., description="List of URLs to extract from")
+    ai_model: str = Field("gpt-3.5-turbo", description="AI model to use for extraction")
+    custom_prompt: Optional[str] = Field(None, description="Custom extraction prompt")
+    template_id: Optional[str] = Field(None, description="Template ID to use")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "urls": ["https://www.example.gov.cn/news/123.html", "https://www.example.gov.cn/news/456.html"],
+                "ai_model": "gpt-3.5-turbo"
+            }
+        }
+
+
+class BatchExtractStatus(BaseModel):
+    task_id: str = Field(..., description="Batch task ID")
+    status: str = Field(..., description="Task status")
+    total: int = Field(..., description="Total number of URLs")
+    completed: int = Field(0, description="Number of completed extractions")
+    failed: int = Field(0, description="Number of failed extractions")
+    created_at: str = Field(..., description="Task creation time")
+    completed_at: Optional[str] = Field(None, description="Task completion time")
+    error: Optional[str] = Field(None, description="Error message if any")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "task_id": "6072f1b12c723a8c9d89a123",
+                "status": "running",
+                "total": 10,
+                "completed": 3,
+                "failed": 0,
+                "created_at": "2024-03-24T12:00:00"
+            }
+        }
+
+
+# Custom Crawl API models
+class CustomCrawlConfig(BaseModel):
+    url: str = Field(..., description="URL to crawl")
+    depth: int = Field(1, ge=1, le=5, description="Crawl depth")
+    use_browser: bool = Field(True, description="Whether to use browser for crawling")
+    follow_links: bool = Field(False, description="Whether to follow links on the page")
+    extract_content: bool = Field(True, description="Whether to extract content")
+    use_llm: bool = Field(False, description="Whether to use LLM for extraction")
+    ai_model: Optional[str] = Field(None, description="AI model to use for extraction")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "url": "https://www.example.gov.cn/news/123.html",
+                "depth": 1,
+                "use_browser": True,
+                "follow_links": False,
+                "extract_content": True,
+                "use_llm": False
+            }
+        }
+
+
+class CustomCrawlResult(BaseModel):
+    crawl_id: str = Field(..., description="Crawl ID")
+    url: str = Field(..., description="Crawled URL")
+    status: str = Field(..., description="Crawl status")
+    content: Optional[Dict[str, Any]] = Field(None, description="Extracted content")
+    html: Optional[str] = Field(None, description="HTML content")
+    links: Optional[List[str]] = Field(None, description="Extracted links")
+    created_at: str = Field(..., description="Crawl time")
+    error: Optional[str] = Field(None, description="Error message if any")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "crawl_id": "6072f1b12c723a8c9d89a123",
+                "url": "https://www.example.gov.cn/news/123.html",
+                "status": "completed",
+                "content": {
+                    "title": "关于推进智慧城市建设的通知",
+                    "publish_date": "2024-03-15T00:00:00",
+                    "department": "发展和改革委员会",
+                    "content": "为深入贯彻落实党的二十大精神..."
+                },
+                "links": ["https://www.example.gov.cn/news/456.html"],
+                "created_at": "2024-03-24T12:00:00"
+            }
+        }
+
+
+class AdvancedCrawlerConfig(BaseModel):
+    user_agent: Optional[str] = Field(None, description="Custom User-Agent string")
+    headers: Optional[Dict[str, str]] = Field(None, description="Custom HTTP headers")
+    proxy: Optional[str] = Field(None, description="Proxy URL")
+    timeout: int = Field(30, description="Request timeout in seconds")
+    retry_count: int = Field(3, description="Number of retries for failed requests")
+    robots_txt: bool = Field(True, description="Whether to respect robots.txt")
+    javascript_support: bool = Field(True, description="Whether to enable JavaScript support")
+    url_patterns: Optional[List[str]] = Field(None, description="URL patterns to include")
+    exclude_patterns: Optional[List[str]] = Field(None, description="URL patterns to exclude")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "headers": {"Accept-Language": "zh-CN,zh;q=0.9"},
+                "timeout": 30,
+                "retry_count": 3,
+                "robots_txt": True,
+                "javascript_support": True,
+                "url_patterns": [".*/news/.*", ".*/notices/.*"],
+                "exclude_patterns": [".*/login/.*", ".*/search/.*"]
+            }
+        }
+
+
+# Vector API models
+class VectorizationTemplate(BaseModel):
+    name: str = Field(..., description="Template name")
+    description: Optional[str] = Field(None, description="Template description")
+    text_fields: List[str] = Field(..., description="Text fields to vectorize")
+    metadata_fields: Optional[List[str]] = Field(None, description="Metadata fields to include")
+    chunk_size: Optional[int] = Field(None, description="Text chunk size for long documents")
+    chunk_overlap: Optional[int] = Field(None, description="Chunk overlap for long documents")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "标准文章向量化",
+                "description": "标准的政府文章向量化模板",
+                "text_fields": ["title", "content"],
+                "metadata_fields": ["publish_date", "department"],
+                "chunk_size": 1000,
+                "chunk_overlap": 200
+            }
+        }
+
+
+class BatchVectorizeConfig(BaseModel):
+    article_ids: Optional[List[str]] = Field(None, description="List of article IDs to vectorize")
+    filter: Optional[Dict[str, Any]] = Field(None, description="Filter criteria for articles")
+    template_id: Optional[str] = Field(None, description="Template ID to use")
+    model: Optional[str] = Field(None, description="Vector model to use")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "article_ids": ["6072f1b12c723a8c9d89a123", "6072f1b12c723a8c9d89a124"],
+                "template_id": "6072f1b12c723a8c9d89a125"
+            }
+        }
+
+
+class SimilaritySearchConfig(BaseModel):
+    query: str = Field(..., description="Search query")
+    filter: Optional[Dict[str, Any]] = Field(None, description="Filter criteria")
+    top_k: int = Field(10, description="Number of results to return")
+    threshold: Optional[float] = Field(None, description="Similarity threshold")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "query": "智慧城市建设政策",
+                "filter": {"department": "发展和改革委员会"},
+                "top_k": 10,
+                "threshold": 0.7
+            }
+        }

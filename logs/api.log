@@ -1,0 +1,244 @@
+2025-03-27 10:39:44 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:39:44 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:39:44 - api - ERROR - API key required for openai
+2025-03-27 10:39:44 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:39:44 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:39:44 - api - ERROR - API key required for openai
+2025-03-27 10:44:49 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:44:49 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:44:49 - api - ERROR - API key required for openai
+2025-03-27 10:44:49 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:44:49 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:44:49 - api - ERROR - API key required for openai
+2025-03-27 10:49:54 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:49:54 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:49:54 - api - ERROR - API key required for openai
+2025-03-27 10:49:54 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:49:54 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:49:54 - api - ERROR - API key required for openai
+2025-03-27 10:54:59 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:54:59 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:54:59 - api - ERROR - API key required for openai
+2025-03-27 10:54:59 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 10:54:59 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 10:54:59 - api - ERROR - API key required for openai
+2025-03-27 11:00:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:00:00 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 11:00:00 - api - ERROR - API key required for openai
+2025-03-27 11:00:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:00:00 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 11:00:00 - api - ERROR - API key required for openai
+2025-03-27 11:05:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:05:00 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 11:05:00 - api - ERROR - API key required for openai
+2025-03-27 11:05:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:05:00 - api - INFO - 解析后的参数: provider=openai, service_name=default
+2025-03-27 11:05:00 - api - ERROR - API key required for openai
+2025-03-27 11:10:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:10:00 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:10:00 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:10:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:10:00 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:10:00 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:11:52 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:11:52 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:11:52 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:12:54 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:12:54 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:12:54 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:14:27 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:14:27 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:14:27 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:14:27 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:14:27 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:14:27 - api - INFO - 成功连接到 openai (模式: cloud)
+2025-03-27 11:17:23 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:17:23 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:17:23 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:17:23 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:17:23 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:17:23 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:17:23 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:17:23 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:17:23 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:17:23 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:17:25 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:17:25 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:17:25 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:17:25 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:22:24 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:22:24 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:22:24 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:22:24 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:22:24 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:22:24 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:22:24 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:22:24 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:28 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:28 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:28 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:28 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:28 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:28 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:28 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:28 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:28 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:30 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:30 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:30 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:30 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:23:48 - api - INFO - 接收LLM连接测试请求，请求数据: {"model": "gpt-3.5-turbo", "temperature": 0.7, "max_tokens": 1000, "provider": "openai", "timeout": 30, "retry_count": 3, "activeProvider": "cloud"}
+2025-03-27 11:23:48 - api - INFO - 解析后的参数: provider=openai, service_name=default, activeProvider=cloud
+2025-03-27 11:23:48 - api - ERROR - API key required for openai in cloud mode
+2025-03-27 11:23:48 - api - ERROR - Error testing connection: 400: API key required for openai in cloud mode
+2025-03-27 11:26:35 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:35 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:35 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:35 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:35 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:35 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:35 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:35 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:35 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:35 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:56 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:56 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:56 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:56 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:56 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:56 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:56 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:56 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:56 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:26:58 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:26:58 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:26:58 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:26:58 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:27:04 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:27:04 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:27:04 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:27:04 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:29:55 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:29:55 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:29:55 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:29:55 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:29:55 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:29:55 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:29:55 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:29:56 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:29:56 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:29:56 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:29:56 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:30:00 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:30:00 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:30:00 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:30:00 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:30:04 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:30:04 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:30:04 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:30:04 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:33:02 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:33:02 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:33:02 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:33:02 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:33:02 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:33:02 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - INFO - 接收LLM连接测试请求，请求数据: {"provider": "cloud"}
+2025-03-27 11:33:02 - api - INFO - 解析后的参数: provider=cloud, service_name=default, activeProvider=local
+2025-03-27 11:33:02 - api - ERROR - Unsupported provider type: cloud
+2025-03-27 11:33:02 - api - ERROR - Error testing connection: 400: Unsupported provider type: cloud
+2025-03-27 14:06:04 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 14:06:04 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 14:06:17 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 14:06:17 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:07:04 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:07:04 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:12:03 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:12:03 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:12:12 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:12:12 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:15:36 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:15:36 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:15:41 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:15:41 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:15:42 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:15:42 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:41:25 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:41:25 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:51:15 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:51:15 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 16:51:17 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 16:51:17 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 17:13:58 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 17:13:58 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 17:19:27 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 17:19:27 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 17:34:15 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 17:34:15 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 17:39:55 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 17:39:55 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 18:00:45 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 18:00:45 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 18:13:22 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 18:13:22 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 18:40:47 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 18:40:47 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 18:49:55 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 18:49:55 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:24:36 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:24:36 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:29:46 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:29:46 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:31:20 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:31:20 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:31:23 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:31:23 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:32:56 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:32:56 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:32:59 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:32:59 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:33:12 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:33:12 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:40:07 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:40:07 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:45:10 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:45:10 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'
+2025-03-27 19:48:30 - api - INFO - 接收获取LLM服务配置请求
+2025-03-27 19:48:30 - api - ERROR - 获取LLM服务配置异常: 'LLMServiceConfig' object has no attribute 'description'

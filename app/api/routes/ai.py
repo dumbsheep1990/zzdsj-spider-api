@@ -625,3 +625,270 @@ async def get_batch_status(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve batch status: {str(e)}")
+
+
+@router.get("/extract-templates",
+            summary="Get extraction templates",
+            description="Returns a list of all extraction templates.",
+            response_description="List of extraction templates"
+            )
+async def get_extract_templates(db=Depends(get_async_db)):
+    """Get all extraction templates"""
+    try:
+        cursor = db.ai_templates.find({}).sort("name", 1)
+        templates = await cursor.to_list(length=100)
+        
+        # Process the results
+        result = []
+        for template in templates:
+            template["id"] = str(template["_id"])
+            del template["_id"]
+            
+            if "created_at" in template:
+                template["created_at"] = template["created_at"].isoformat() if isinstance(template["created_at"], datetime) else template["created_at"]
+                
+            if "updated_at" in template:
+                template["updated_at"] = template["updated_at"].isoformat() if isinstance(template["updated_at"], datetime) else template["updated_at"]
+                
+            result.append(template)
+            
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get extraction templates: {str(e)}")
+
+
+@router.get("/extract-template/{template_id}",
+            summary="Get extraction template",
+            description="Returns details of a specific extraction template.",
+            response_description="Extraction template details"
+            )
+async def get_extract_template(template_id: str = Path(..., description="Template ID"), 
+                               db=Depends(get_async_db)):
+    """Get a specific extraction template"""
+    try:
+        # Convert string ID to ObjectId
+        try:
+            obj_id = ObjectId(template_id)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid template ID format")
+        
+        # Get template from database
+        template = await db.ai_templates.find_one({"_id": obj_id})
+        
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Format the result
+        template["id"] = str(template["_id"])
+        del template["_id"]
+        
+        if "created_at" in template:
+            template["created_at"] = template["created_at"].isoformat() if isinstance(template["created_at"], datetime) else template["created_at"]
+            
+        if "updated_at" in template:
+            template["updated_at"] = template["updated_at"].isoformat() if isinstance(template["updated_at"], datetime) else template["updated_at"]
+            
+        return template
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get extraction template: {str(e)}")
+
+
+@router.post("/extract-template",
+             summary="Save extraction template",
+             description="Saves a new extraction template or updates an existing one.",
+             response_description="Saved extraction template"
+             )
+async def save_extract_template(name: str = Form(..., description="Template name"),
+                                prompt: str = Form(..., description="Extraction prompt"),
+                                description: Optional[str] = Form(None, description="Template description"),
+                                template_id: Optional[str] = Form(None, description="Template ID (for updates)"),
+                                schema: Optional[str] = Form(None, description="Extraction schema JSON"),
+                                db=Depends(get_async_db)):
+    """Save an extraction template"""
+    try:
+        now = datetime.now()
+        template_data = {
+            "name": name,
+            "prompt": prompt,
+            "description": description,
+            "updated_at": now
+        }
+        
+        # Parse schema if provided
+        if schema:
+            import json
+            try:
+                template_data["schema"] = json.loads(schema)
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid schema JSON")
+        
+        # Update existing or create new
+        if template_id:
+            # Convert string ID to ObjectId
+            try:
+                obj_id = ObjectId(template_id)
+            except Exception:
+                raise HTTPException(status_code=400, detail="Invalid template ID format")
+            
+            # Check if template exists
+            existing = await db.ai_templates.find_one({"_id": obj_id})
+            if not existing:
+                raise HTTPException(status_code=404, detail="Template not found")
+            
+            # Update existing template
+            await db.ai_templates.update_one(
+                {"_id": obj_id},
+                {"$set": template_data}
+            )
+            
+            # Return updated template
+            result = await db.ai_templates.find_one({"_id": obj_id})
+            result["id"] = str(result["_id"])
+            del result["_id"]
+            
+            if "created_at" in result:
+                result["created_at"] = result["created_at"].isoformat() if isinstance(result["created_at"], datetime) else result["created_at"]
+                
+            if "updated_at" in result:
+                result["updated_at"] = result["updated_at"].isoformat() if isinstance(result["updated_at"], datetime) else result["updated_at"]
+                
+            return result
+            
+        else:
+            # Create new template
+            template_data["created_at"] = now
+            insert_result = await db.ai_templates.insert_one(template_data)
+            
+            # Return new template
+            template_id = str(insert_result.inserted_id)
+            return {
+                "id": template_id,
+                "name": name,
+                "prompt": prompt,
+                "description": description,
+                "schema": template_data.get("schema"),
+                "created_at": now.isoformat(),
+                "updated_at": now.isoformat()
+            }
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save extraction template: {str(e)}")
+
+
+@router.delete("/extract-template/{template_id}",
+               summary="Delete extraction template",
+               description="Deletes a specific extraction template.",
+               response_description="Deletion confirmation"
+               )
+async def delete_extract_template(template_id: str = Path(..., description="Template ID"), 
+                                  db=Depends(get_async_db)):
+    """Delete an extraction template"""
+    try:
+        # Convert string ID to ObjectId
+        try:
+            obj_id = ObjectId(template_id)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid template ID format")
+        
+        # Check if template exists
+        existing = await db.ai_templates.find_one({"_id": obj_id})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Delete the template
+        result = await db.ai_templates.delete_one({"_id": obj_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=500, detail="Template deletion failed")
+        
+        return {"message": "Template deleted successfully", "id": template_id}
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete extraction template: {str(e)}")
+
+
+@router.post("/extract-with-template",
+             summary="Extract content using template",
+             description="Extracts content from URL or HTML using a specific template.",
+             response_description="Extraction result"
+             )
+async def extract_with_template(background_tasks: BackgroundTasks,
+                                 template_id: str = Form(..., description="Template ID"),
+                                 url: Optional[str] = Form(None, description="URL to extract from"),
+                                 html_content: Optional[str] = Form(None, description="HTML content to extract from"),
+                                 ai_model: str = Form("gpt-3.5-turbo", description="AI model to use"),
+                                 db=Depends(get_async_db)):
+    """Extract content using a specific template"""
+    try:
+        # Validate inputs
+        if not url and not html_content:
+            raise HTTPException(status_code=400, detail="Either URL or HTML content must be provided")
+        
+        if url and html_content:
+            raise HTTPException(status_code=400, detail="Provide either URL or HTML content, not both")
+        
+        # Convert string ID to ObjectId
+        try:
+            obj_id = ObjectId(template_id)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid template ID format")
+        
+        # Get template from database
+        template = await db.ai_templates.find_one({"_id": obj_id})
+        
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        # Determine source type and source
+        source_type = "url" if url else "html"
+        source = url if url else html_content
+        
+        # Create extraction record
+        extraction_id = ObjectId()
+        now = datetime.now()
+        
+        extraction_data = {
+            "_id": extraction_id,
+            "type": source_type,
+            "source": source,
+            "ai_model": ai_model,
+            "template_id": template_id,
+            "template_name": template.get("name"),
+            "status": "processing",
+            "created_at": now
+        }
+        
+        await db.ai_extractions.insert_one(extraction_data)
+        
+        # Start extraction in background
+        background_tasks.add_task(
+            perform_extraction,
+            extraction_id=extraction_id,
+            source_type=source_type,
+            source=source,
+            ai_model=ai_model,
+            custom_prompt=template.get("prompt"),
+            extraction_schema=template.get("schema"),
+            db=db
+        )
+        
+        # Return initial response
+        return {
+            "id": str(extraction_id),
+            "type": source_type,
+            "status": "processing",
+            "created_at": now.isoformat()
+        }
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start extraction with template: {str(e)}")
